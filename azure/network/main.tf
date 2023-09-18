@@ -27,7 +27,6 @@ resource "azurerm_network_security_group" "nsg" {
     direction                    = var.nsgrules.direction
     access                       = var.nsgrules.access
     protocol                     = var.nsgrules.protocol
-    source_port_ranges           = var.nsgrules.source_port_ranges
     destination_port_ranges      = var.nsgrules.destination_port_ranges
     source_address_prefixes      = var.nsgrules.source_address_prefixes
     destination_address_prefixes = var.nsgrules.destination_address_prefixes
