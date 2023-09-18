@@ -22,14 +22,15 @@ resource "azurerm_network_security_group" "nsg" {
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
   security_rule {
-    name                         = var.nsgrules.name
-    priority                     = var.nsgrules.priority
-    direction                    = var.nsgrules.direction
-    access                       = var.nsgrules.access
-    protocol                     = var.nsgrules.protocol
-    destination_port_ranges      = var.nsgrules.destination_port_ranges
-    source_address_prefixes      = var.nsgrules.source_address_prefixes
-    destination_address_prefixes = var.nsgrules.destination_address_prefixes
+    name                       = var.nsgrules.name
+    priority                   = var.nsgrules.priority
+    direction                  = var.nsgrules.direction
+    access                     = var.nsgrules.access
+    protocol                   = var.nsgrules.protocol
+    source_port_range          = var.nsgrules.source_port_range
+    destination_port_ranges    = var.nsgrules.destination_port_ranges
+    source_address_prefixes    = var.nsgrules.source_address_prefixes
+    destination_address_prefix = var.nsgrules.destination_address_prefix
   }
   tags = var.tags
 }
