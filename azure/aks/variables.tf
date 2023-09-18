@@ -47,7 +47,7 @@ variable "private_cluster_enabled" {
 }
 
 variable "kubernetes_version" {
-  default = 1.27
+  default = "1.27.1"
 }
 
 
