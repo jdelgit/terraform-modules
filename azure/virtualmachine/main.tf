@@ -1,3 +1,13 @@
+resource "azurerm_public_ip" "vm_pip" {
+  count               = var.enable_public_ip == true ? 1 : 0
+  name                = "${var.vm_name}-${var.pubip_suffix}"
+  resource_group_name = var.resource_group_name
+  location            = var.resource_group_location
+  allocation_method   = var.pubip_allocation_method
+  sku                 = var.pubip_sku
+  tags                = var.tags
+}
+
 # create a network interface with a static ip
 resource "azurerm_network_interface" "nic" {
   name                = var.nic_name
@@ -8,8 +18,9 @@ resource "azurerm_network_interface" "nic" {
   ip_configuration {
     name                          = var.vm_nic_config
     subnet_id                     = var.vm_subnet_id
-    private_ip_address_allocation = "Static"
+    private_ip_address_allocation = var.privateip_allocation_method
     private_ip_address            = var.vm_private_ip
+    public_ip_address_id          = azurerm_public_ip.vm_pip[0].id
   }
 
 }

@@ -14,6 +14,27 @@ variable "tags" {
   }
 }
 
+variable "enable_public_ip" {
+  default = false
+}
+
+variable "pubip_sku" {
+  default = "Basic"
+}
+
+variable "pubip_suffix" {
+  default = "pip"
+}
+
+variable "privateip_allocation_method" {
+  default = "Static"
+}
+
+variable "pubip_allocation_method" {
+  default = "Static"
+}
+
+
 variable "vm_name" {
   default = "test-vm"
 }
