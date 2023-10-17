@@ -59,7 +59,7 @@ variable "network_plugin" {
   default = "kubenet"
 }
 
-variable "api_server_authorized_ip_ranges" {
+variable "authorized_ip_ranges" {
   default = []
 }
 

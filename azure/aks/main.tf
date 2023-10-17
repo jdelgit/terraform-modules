@@ -6,9 +6,12 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   dns_prefix                      = var.cluster_dns_prefix
   private_cluster_enabled         = var.private_cluster_enabled
   kubernetes_version              = var.kubernetes_version
-  api_server_authorized_ip_ranges = var.api_server_authorized_ip_ranges
   sku_tier                        = var.cluster_sku_tier
-  public_network_access_enabled   = var.public_network_access_enabled
+
+  api_server_access_profile {
+    authorized_ip_ranges    = var.private_cluster_enabled ? null : var.authorized_ip_ranges
+    vnet_integration_enabled = false
+  }
 
   default_node_pool {
     name                = "default"
@@ -25,7 +28,9 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   network_profile {
     load_balancer_sku = var.load_balancer_sku
     network_plugin    = var.network_plugin
+
   }
+
   azure_active_directory_role_based_access_control {
     managed                = true
     admin_group_object_ids = var.cluster_admin_group_ids
