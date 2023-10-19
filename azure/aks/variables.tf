@@ -18,6 +18,10 @@ variable "cluster_dns_prefix" {
   default = "devk8s"
 }
 
+variable "vnet_subnet_id" {
+  default = "testsubnet"
+}
+
 variable "resource_group_location" {
   default = "westeurope"
 }

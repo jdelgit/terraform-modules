@@ -27,12 +27,10 @@ module "ssh_setup" {
   storage_permissions             = var.keyvault_storage_permissions
   certificate_permissions         = var.keyvault_certificate_permissions
   source                          = "./../sshkey"
-
-
 }
 
 resource "azurerm_public_ip" "vm_pip" {
-  count               = var.enable_public_ip == true ? 1 : 0
+  count               = var.create_public_ip == true ? 1 : 0
   name                = "${var.vm_name}-pip"
   resource_group_name = var.resource_group_name
   location            = var.resource_group_location
@@ -50,52 +48,16 @@ resource "azurerm_network_interface" "nic" {
 
   ip_configuration {
     name                          = "${var.vm_name}-nic-config"
-    subnet_id                     = module.network_setup[0].vm_subnet_id
+    subnet_id                     = var.create_network == true ? module.network_setup[0].vm_subnet_id : var.vm_subnet_id
     private_ip_address_allocation = var.privateip_allocation_method
     private_ip_address            = var.vm_private_ip
-    public_ip_address_id          = azurerm_public_ip.vm_pip[0].id
+    public_ip_address_id          = var.create_public_ip ==true ? azurerm_public_ip.vm_pip[0].id : null
   }
 
 }
 
 # create the virtual machine with given ssh-key
-resource "azurerm_linux_virtual_machine" "virtualmachine_provided_key" {
-  count               = var.create_ssh_key == false ? 1 : 0
-  name                = var.vm_name
-  resource_group_name = var.resource_group_name
-  location            = var.resource_group_location
-  size                = var.vm_size
-  admin_username      = var.admin_name
-  network_interface_ids = [
-    azurerm_network_interface.nic.id,
-  ]
-
-  tags = var.tags
-
-  admin_ssh_key {
-    username   = var.admin_name
-    public_key = var.admin_pubkey
-  }
-
-  os_disk {
-    storage_account_type = var.vm_storage_account_type
-    caching              = var.vm_caching
-    disk_size_gb         = var.vm_disk_size_gb
-  }
-
-  source_image_reference {
-    publisher = var.vm_publisher
-    offer     = var.vm_offer
-    sku       = var.vm_sku
-    version   = var.vm_version
-  }
-
-  identity {
-    type = "SystemAssigned"
-  }
-}
-
-resource "azurerm_linux_virtual_machine" "virtualmachine_genkey" {
+resource "azurerm_linux_virtual_machine" "vm" {
   count               = var.create_ssh_key == true ? 1 : 0
   name                = var.vm_name
   resource_group_name = var.resource_group_name
@@ -110,7 +72,7 @@ resource "azurerm_linux_virtual_machine" "virtualmachine_genkey" {
 
   admin_ssh_key {
     username   = var.admin_name
-    public_key = module.ssh_setup[0].public_key
+    public_key = var.create_ssh_key == true ? module.ssh_setup[0].public_key : var.admin_pubkey
   }
 
   os_disk {

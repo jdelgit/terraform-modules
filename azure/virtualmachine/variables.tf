@@ -18,7 +18,7 @@ variable "tags" {
   }
 }
 
-variable "enable_public_ip" {
+variable "create_public_ip" {
   default = false
 }
 
@@ -35,14 +35,14 @@ variable "pubip_allocation_method" {
 }
 
 variable "create_network" {
-  default = true
+  default = false
 }
 
 variable "create_ssh_key" {
-  default = true
+  default = false
 }
 variable "create_keyvault" {
-  default = true
+  default = false
 }
 
 variable "vm_name" {

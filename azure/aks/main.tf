@@ -15,14 +15,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
 
   default_node_pool {
     name                = "default"
-    enable_auto_scaling = var.enable_auto_scaling
-    node_count          = var.node_count
-    min_count           = var.enable_auto_scaling ? var.min_count : null
-    max_count           = var.enable_auto_scaling ? var.max_count : null
     vm_size             = var.cluster_node_size
-    os_disk_size_gb     = var.cluster_node_os_disk_size_gb
-    zones               = var.zones
-    tags                = var.tags
   }
 
   network_profile {
@@ -42,4 +35,19 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   }
 
   tags = var.tags
+}
+
+
+resource "azurerm_kubernetes_cluster_node_pool" "nodepool" {
+  name                  = "internal"
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.cluster.id
+  vm_size               = var.cluster_node_size
+  vnet_subnet_id        = var.vnet_subnet_id
+  node_count            = var.node_count
+  enable_auto_scaling   = var.enable_auto_scaling
+  min_count             = var.enable_auto_scaling ? var.min_count : null
+  max_count             = var.enable_auto_scaling ? var.max_count : null
+  os_disk_size_gb       = var.cluster_node_os_disk_size_gb
+  zones                 = var.zones
+  tags                  = var.tags
 }
