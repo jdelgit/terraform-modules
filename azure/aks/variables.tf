@@ -1,87 +1,142 @@
 variable "cluster_name" {
+  type    = string
   default = "example-k8s-aks"
 }
 
 variable "cluster_admin_group_ids" {
-  default = []
+  description = "List of AAD group IDs to assign as admins of cluster"
+  type        = list(string)
+  default     = [""]
 }
 
-variable "cluster_node_os_disk_size_gb" {
-  default = "30"
+variable "default_node_os_disk_size_gb" {
+  description = "Cluster nodes OS disk size"
+  type        = string
+  default     = "30"
 }
 
-variable "cluster_node_size" {
-  default = "Standard_D2_v2"
+variable "default_node_size" {
+  description = "Azure node size for cluster nodes"
+  type        = string
+  default     = "Standard_D2_v2"
 }
 
 variable "cluster_dns_prefix" {
-  default = "devk8s"
+  description = "Prefix to use for Cluster DNS resource"
+  type        = string
+  default     = "devk8s"
 }
+
+variable "cluster_azure_rbac_enabled" {
+  description = "Enable RBAC on AKS cluster"
+  type        = bool
+  default     = true
+}
+
 
 variable "vnet_subnet_id" {
-  default = "testsubnet"
+  description = "ID of user created subnet to use for cluster"
+  type        = string
+  default     = ""
 }
 
-variable "resource_group_location" {
-  default = "westeurope"
+variable "vnet_integration_enabled" {
+  description = "Enable cluster vnet integration"
+  type        = bool
+  default     = false
+}
+
+variable "location" {
+  description = "Location to deploy cluster"
+  type        = string
+  default     = "westeurope"
 }
 
 variable "resource_group_name" {
+  type    = string
   default = "k8s-resourcegroup"
 }
 
 variable "enable_auto_scaling" {
-  default = false
+  description = "Enable cluster node autoscaling"
+  type        = bool
+  default     = false
 }
 
-variable "node_count" {
-  default = 1
+variable "default_node_pool_node_count" {
+  description = "Initial number of nodes in cluster"
+  type        = number
+  default     = 1
 }
 
-variable "max_count" {
-  default = 3
+variable "default_node_pool_max_count" {
+  description = "Minimum number of nodes in cluster"
+  type        = number
+  default     = 3
 }
 
-variable "min_count" {
-  default = 1
+variable "default_node_pool_min_count" {
+  description = "Maximum number of nodes in cluster"
+  type        = number
+  default     = 1
+}
+
+variable "default_node_temporary_name_for_rotation" {
+  description = "Name used for spinning up and switching nodes"
+  type        = string
+  default     = "tmpvmrotate"
 }
 
 variable "private_cluster_enabled" {
-  default = false
+  description = "Enable Private cluster and create private endpoint"
+  type        = bool
+  default     = false
 }
 
 variable "kubernetes_version" {
-  default = "1.27.1"
+  description = "Kubernetes version used in cluster"
+  type        = string
+  default     = "1.27.1"
 }
 
-
 variable "load_balancer_sku" {
-  default = "standard"
+  description = "SKU for AKS public loadbalancer"
+  type        = string
+  default     = "standard"
 }
 
 variable "network_plugin" {
-  default = "kubenet"
+  description = "Network plugin to use for kubernetes"
+  default     = "kubenet"
 }
 
 variable "authorized_ip_ranges" {
-  default = []
+  description = "CIDRs allowed to access kube-apiserver"
+  type        = list(string)
+  default     = [""]
 }
 
 variable "zones" {
-  default = []
-}
-
-variable "public_network_access_enabled" {
-  default = true
+  description = "Availability zones for cluster"
+  type        = list(string)
+  default     = [""]
 }
 
 variable "cluster_sku_tier" {
-  default = "Free"
+  description = "SKU tier for cluster"
+  type        = string
+  default     = "Free"
 }
 
 variable "tags" {
+  description = "Resource tags"
+  type = object({
+    environment = string
+    projectCode = string
+    invoiceCode = string
+  })
   default = {
-    environment = "test"
+    environment = "dev"
     projectCode = "terraform-template"
     invoiceCode = "tf-test"
   }

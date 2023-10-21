@@ -11,5 +11,5 @@ output "keyvault_id" {
 }
 
 output "ssh_private_key_name" {
-  value = azurerm_key_vault_secret.ssh_secret[0].name
+  value = azurerm_key_vault_secret.ssh_secret.name
 }
