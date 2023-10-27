@@ -9,22 +9,6 @@ module "network_setup" {
   tags                = var.tags
 }
 
-module "ssh_setup" {
-  count                            = var.create_ssh_key == true ? 1 : 0
-  ssh_key_name                     = "${var.vm_name}-sshkey"
-  location                         = var.location
-  resource_group_name              = var.resource_group_name
-  resource_group_id                = var.resource_group_id
-  tenant_id                        = var.tenant_id
-  create_keyvault                  = var.create_keyvault
-  keyvault_access_policies         = var.keyvault_access_policies
-  keyvault_create_private_dns_zone = var.keyvault_create_private_dns_zone
-  keyvault_create_private_endpoint = var.keyvault_create_private_endpoint
-  keyvault_store_id                = var.ssh_keyvault_store_id
-  source                           = "./../sshkey"
-  tags                             = var.tags
-}
-
 resource "azurerm_public_ip" "vm_pip" {
   count               = var.create_public_ip == true ? 1 : 0
   name                = "${var.vm_name}-pip"
@@ -58,16 +42,19 @@ resource "azurerm_linux_virtual_machine" "vm" {
   resource_group_name = var.resource_group_name
   location            = var.location
   size                = var.vm_size
-  admin_username      = var.admin_name
+  admin_username      = var.admin_ssh_data[0].username
   network_interface_ids = [
     azurerm_network_interface.nic.id,
   ]
 
   tags = var.tags
 
-  admin_ssh_key {
-    username   = var.admin_name
-    public_key = var.create_ssh_key == true ? module.ssh_setup[0].public_key : var.admin_pubkey
+  dynamic "admin_ssh_key" {
+    for_each = var.admin_ssh_data
+    content {
+      username   = admin_ssh_key.value["username"]
+      public_key = strcontains(admin_ssh_key.value["public_key"], ".pub") ? file(admin_ssh_key.value["public_key"]) : admin_ssh_key.value["public_key"]
+    }
   }
 
   os_disk {

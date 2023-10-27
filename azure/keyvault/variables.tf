@@ -74,12 +74,6 @@ variable "allowed_ips" {
   default     = [""]
 }
 
-variable "virtual_network_subnet_ids" {
-  description = "IDs of subnets to connect to keyvault"
-  type        = list(string)
-  default     = [""]
-}
-
 variable "network_default_action" {
   description = "Default premission action"
   type        = string
@@ -106,6 +100,26 @@ variable "access_policies" {
     certificate_permissions       = ["Get", "List", "Create", "Update"]
     }
   ]
+}
+
+variable "virtual_network_subnet_ids" {
+  description = "IDs of subnets to connect to keyvault"
+  type  = list(string)
+}
+
+variable "network_acls" {
+  description = "Keyvault network policies"
+  type = object({
+    bypass = string
+    default_action = string
+    ip_rules = list(string)
+
+  })
+  default = {
+    bypass = "None"
+    default_action = "Deny"
+    ip_rules = [""]
+  }
 }
 
 variable "create_private_dns_zone" {

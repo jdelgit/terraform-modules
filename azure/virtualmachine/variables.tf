@@ -50,34 +50,6 @@ variable "create_network" {
   type        = bool
 }
 
-variable "create_ssh_key" {
-  description = "Optionally create SSH key-pair for Virtualmachine"
-  type        = bool
-}
-variable "create_keyvault" {
-  description = "Optionally create keyvault to store SSH private keys for Virtualmachine"
-  type        = bool
-  default     = false
-}
-
-variable "keyvault_create_private_dns_zone" {
-  description = "Optionally create private DNS zone for keyvault"
-  type        = bool
-  default     = false
-}
-
-variable "keyvault_create_private_endpoint" {
-  description = "Create private endpoint to access keyvault"
-  type        = bool
-  default     = false
-}
-
-variable "ssh_keyvault_store_id" {
-  description = "Keyvault to store generated SSH keys"
-  type        = string
-  default     = ""
-}
-
 variable "vm_name" {
   description = "Name of Virtualmachine"
   type        = string
@@ -90,16 +62,12 @@ variable "vm_size" {
   default     = "Standard_D2_v2"
 }
 
-variable "admin_name" {
-  description = "Name of user with admin permissions of Virtualmachine"
-  type        = string
-  default     = "azureuser"
-}
-
-variable "admin_pubkey" {
-  description = "Public SSH key of user with admin rights"
-  type        = string
-  default     = "ssh-rsa123456" # Use file(/path/to/file) to pass file
+variable "admin_ssh_data" {
+  description = "Data for admin login"
+  type = list(object({
+    username   = string
+    public_key = string
+  }))
 }
 
 variable "vm_subnet_id" {
@@ -118,11 +86,13 @@ variable "subnet" {
   type = object({
     name                                      = string
     address_prefixes                          = list(string)
+    service_endpoints                         = list(string)
     private_endpoint_network_policies_enabled = bool
   })
   default = {
     name : "vm-subnet"
     address_prefixes : ["10.0.0.0/24"]
+    service_endpoints = null
     private_endpoint_network_policies_enabled : true
   }
 }
@@ -192,25 +162,4 @@ variable "tenant_id" {
   description = "Azure Tenant ID"
   type        = string
   default     = "123456798"
-}
-
-variable "keyvault_access_policies" {
-  description = "Keyvault access policies"
-  type = list(object({
-    name                          = string
-    access_policy_group_object_id = string
-    key_permissions               = list(string)
-    secret_permissions            = list(string)
-    storage_permissions           = list(string)
-    certificate_permissions       = list(string)
-  }))
-  default = [{
-    name                          = "default"
-    access_policy_group_object_id = "value"
-    key_permissions               = ["Get", "List", "Create", "Update"]
-    secret_permissions            = ["Get", "List", "Set"]
-    storage_permissions           = ["Get", "List", "Update"]
-    certificate_permissions       = ["Get", "List", "Create", "Update"]
-    }
-  ]
 }

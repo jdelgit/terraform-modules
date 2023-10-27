@@ -1,12 +1,12 @@
 variable "resource_group_name" {
-  type = string
+  type    = string
   default = "test-rg"
 }
 
 variable "location" {
-  type = string
+  type        = string
   description = "Location where resource should be deployed"
-  default = "westeurope"
+  default     = "westeurope"
 }
 
 variable "tags" {
@@ -25,18 +25,18 @@ variable "tags" {
 
 variable "vnet_name" {
   description = "Name of virtual network"
-  type = string
+  type        = string
   default     = "test-vnet"
 }
 
 variable "address_space" {
   description = "VNET address space"
   type        = list(string)
-  default = [ "10.0.0.0/16" ]
+  default     = ["10.0.0.0/16"]
 }
 
 variable "network_security_group_name" {
-  type = string
+  type    = string
   default = "test-nsg"
 }
 
@@ -46,6 +46,7 @@ variable "subnets" {
     name                                      = string
     address_prefixes                          = list(string)
     private_endpoint_network_policies_enabled = bool
+    service_endpoints                         = list(string)
   }))
 }
 

@@ -9,21 +9,28 @@ resource "azurerm_key_vault" "kv" {
   purge_protection_enabled      = var.purge_protection_enabled
   public_network_access_enabled = var.public_network_access_enabled
 
+  dynamic "access_policy" {
+    for_each = var.access_policies
+    content {
+      tenant_id               = var.tenant_id
+      object_id               = access_policy.value["access_policy_group_object_id"]
+      key_permissions         = access_policy.value["key_permissions"]
+      secret_permissions      = access_policy.value["secret_permissions"]
+      storage_permissions     = access_policy.value["storage_permissions"]
+      certificate_permissions = access_policy.value["certificate_permissions"]
+    }
+  }
+
+  network_acls {
+    bypass                     = var.enabled_for_disk_encryption == true ? "AzureServices" : var.network_acls.bypass
+    default_action             = var.network_acls.default_action
+    ip_rules                   = var.network_acls.ip_rules
+    virtual_network_subnet_ids = var.virtual_network_subnet_ids
+  }
+
   sku_name = var.keyvault_sku
   tags     = var.tags
 }
-
-resource "azurerm_key_vault_access_policy" "kvp" {
-  key_vault_id            = azurerm_key_vault.kv.id
-  tenant_id               = var.tenant_id
-  for_each                = { for policy in var.access_policies : policy.name => policy }
-  object_id               = each.value.access_policy_group_object_id
-  key_permissions         = each.value.key_permissions
-  secret_permissions      = each.value.secret_permissions
-  storage_permissions     = each.value.storage_permissions
-  certificate_permissions = each.value.certificate_permissions
-}
-
 
 resource "azurerm_private_dns_zone" "kv" {
   count               = var.create_private_dns_zone == true ? 1 : 0

@@ -9,10 +9,35 @@ variable "cluster_admin_group_ids" {
   default     = [""]
 }
 
+variable "role_based_access_control_enabled" {
+  description = "Enable RBAC for cluster"
+  type        = bool
+  default     = true
+}
+
+variable "oidc_issuer_enabled" {
+  description = "Enable or Disable the OIDC issuer URL"
+  type = bool
+  default = false
+}
+
+variable "run_command_enabled" {
+  description = "Enable run command on cluster"
+  type        = bool
+  default     = true
+}
+
 variable "default_node_os_disk_size_gb" {
   description = "Cluster nodes OS disk size"
   type        = string
   default     = "30"
+}
+
+variable "local_account_disabled" {
+  description = "Local user accounts"
+  type = bool
+  default = true
+
 }
 
 variable "default_node_size" {
@@ -33,6 +58,37 @@ variable "cluster_azure_rbac_enabled" {
   default     = true
 }
 
+variable "keyvault_provider_secrets_rotation_enabled" {
+  description = "Enable CSI Secrets Provider"
+  type        = bool
+  default     = false
+}
+
+variable "keyvault_secrets_provider_id" {
+  description = "Keyvault ID  of keyvault to manage secrets"
+  type        = string
+  default     = null
+}
+
+variable "keyvault_provider_secrets_rotation_interval" {
+  description = "CSI Secrets Provider rotation interval"
+  type        = string
+  default     = null
+}
+
+variable "secrets_provider_secret_identity" {
+  description = "Secret Provider access information"
+  type = list(object({
+    client_id                 = string
+    object_id                 = string
+    user_assigned_identity_id = string
+  }))
+  default = [{
+    client_id                 = null
+    object_id                 = null
+    user_assigned_identity_id = null
+  }]
+}
 
 variable "vnet_subnet_id" {
   description = "ID of user created subnet to use for cluster"
@@ -61,6 +117,13 @@ variable "enable_auto_scaling" {
   description = "Enable cluster node autoscaling"
   type        = bool
   default     = false
+}
+
+variable "default_node_pool_enable_host_encryption" {
+  description = "Set encryption on host"
+  type        = bool
+  default     = true
+
 }
 
 variable "default_node_pool_node_count" {
@@ -119,7 +182,13 @@ variable "authorized_ip_ranges" {
 variable "zones" {
   description = "Availability zones for cluster"
   type        = list(string)
-  default     = [""]
+  default     = null
+}
+
+variable "cluster_secrets_management" {
+  description = "Use Keyvault to manage secrets"
+  type        = bool
+  default     = false
 }
 
 variable "cluster_sku_tier" {

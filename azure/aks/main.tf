@@ -1,17 +1,25 @@
 
 resource "azurerm_kubernetes_cluster" "cluster" {
-  name                    = var.cluster_name
-  location                = var.location
-  resource_group_name     = var.resource_group_name
-  dns_prefix              = var.cluster_dns_prefix
-  private_cluster_enabled = var.private_cluster_enabled
-  kubernetes_version      = var.kubernetes_version
-  sku_tier                = var.cluster_sku_tier
-
+  name                              = var.cluster_name
+  location                          = var.location
+  resource_group_name               = var.resource_group_name
+  dns_prefix                        = var.cluster_dns_prefix
+  private_cluster_enabled           = var.private_cluster_enabled
+  run_command_enabled               = var.run_command_enabled
+  role_based_access_control_enabled = var.role_based_access_control_enabled
+  kubernetes_version                = var.kubernetes_version
+  sku_tier                          = var.cluster_sku_tier
+  local_account_disabled            = var.local_account_disabled
+  oidc_issuer_enabled               = var.oidc_issuer_enabled
 
   api_server_access_profile {
     authorized_ip_ranges     = var.private_cluster_enabled ? null : var.authorized_ip_ranges
     vnet_integration_enabled = var.vnet_integration_enabled
+  }
+
+  key_vault_secrets_provider {
+    secret_rotation_enabled  = var.keyvault_provider_secrets_rotation_enabled
+    secret_rotation_interval = var.keyvault_provider_secrets_rotation_interval
   }
 
   default_node_pool {
@@ -20,6 +28,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     vm_size                     = var.default_node_size
     node_count                  = var.default_node_pool_node_count
     enable_auto_scaling         = var.enable_auto_scaling
+    enable_host_encryption      = var.default_node_pool_enable_host_encryption
     min_count                   = var.enable_auto_scaling ? var.default_node_pool_min_count : null
     max_count                   = var.enable_auto_scaling ? var.default_node_pool_max_count : null
     os_disk_size_gb             = var.default_node_os_disk_size_gb
@@ -45,3 +54,11 @@ resource "azurerm_kubernetes_cluster" "cluster" {
 
   tags = var.tags
 }
+
+resource "azurerm_role_assignment" "k8s_keyvault" {
+  count                = var.cluster_secrets_management == true ? 1 : 0
+  scope                = var.keyvault_secrets_provider_id
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = azurerm_kubernetes_cluster.cluster.key_vault_secrets_provider[0].secret_identity[0].object_id
+}
+
