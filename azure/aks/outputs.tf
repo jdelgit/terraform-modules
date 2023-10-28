@@ -7,6 +7,10 @@ output "kublet_object_id" {
   value = azurerm_kubernetes_cluster.cluster.kubelet_identity
 }
 
+output "node_pool_resource_group" {
+  value = azurerm_kubernetes_cluster.cluster.node_resource_group
+}
+
 output "aks_cluster_id" {
   value = azurerm_kubernetes_cluster.cluster.id
 }
@@ -21,5 +25,4 @@ output "secrets_provider_secret_identity" {
 
 output "oidc_issuer_url" {
   value = azurerm_kubernetes_cluster.cluster.oidc_issuer_url
-
 }

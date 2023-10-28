@@ -28,6 +28,30 @@ variable "enabled_for_disk_encryption" {
   default     = true
 }
 
+variable "create_managed_identity" {
+  description = "Create managed identity for keyvault"
+  type        = bool
+  default     = false
+}
+
+variable "managed_identity_fed_credential_oidc_issuer_url" {
+  description = "OIDC issuer url"
+  type        = string
+  default     = null
+}
+
+variable "managed_identity_fed_credential_audience" {
+  description = "Audience field of federated credential of managed identity"
+  type        = list(string)
+  default     = ["api://AzureADTokenExchange"]
+
+}
+
+variable "managed_identity_fed_credential_subject" {
+  description = "Subject field of federated credential of managed identity"
+  type        = string
+  default     = null
+}
 
 variable "tenant_id" {
   description = "Azure Tenant ID"
@@ -104,21 +128,21 @@ variable "access_policies" {
 
 variable "virtual_network_subnet_ids" {
   description = "IDs of subnets to connect to keyvault"
-  type  = list(string)
+  type        = list(string)
 }
 
 variable "network_acls" {
   description = "Keyvault network policies"
   type = object({
-    bypass = string
+    bypass         = string
     default_action = string
-    ip_rules = list(string)
+    ip_rules       = list(string)
 
   })
   default = {
-    bypass = "None"
+    bypass         = "None"
     default_action = "Deny"
-    ip_rules = [""]
+    ip_rules       = [""]
   }
 }
 

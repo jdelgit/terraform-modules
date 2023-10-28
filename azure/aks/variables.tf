@@ -17,8 +17,44 @@ variable "role_based_access_control_enabled" {
 
 variable "oidc_issuer_enabled" {
   description = "Enable or Disable the OIDC issuer URL"
+  type        = bool
+  default     = false
+}
+
+variable "enable_azure_file_storage" {
+  description = "Enable Volumes using File storage"
   type = bool
-  default = false
+  default = true
+}
+
+variable "snapshot_controller_enabled" {
+  description = "Enable snapshots for storage"
+  type = bool
+  default = true
+}
+
+variable "enable_azure_blob_storage" {
+  description = "Enable Volumes using Blob storage"
+  type = bool
+  default = true
+}
+
+variable "enable_azure_disk_storage" {
+  description = "Enable Volumes using AzureDisk storage"
+  type = bool
+  default = true
+}
+
+variable "azure_disk_driver_version" {
+  description = "Disk CSI Driver version to be used"
+  type = string
+  default = "v1"
+}
+
+variable "workload_identity_enabled" {
+  description = "Enable workload identity"
+  type        = bool
+  default     = false
 }
 
 variable "run_command_enabled" {
@@ -30,13 +66,13 @@ variable "run_command_enabled" {
 variable "default_node_os_disk_size_gb" {
   description = "Cluster nodes OS disk size"
   type        = string
-  default     = "30"
+  default     = "100"
 }
 
 variable "local_account_disabled" {
   description = "Local user accounts"
-  type = bool
-  default = true
+  type        = bool
+  default     = true
 
 }
 
@@ -183,12 +219,6 @@ variable "zones" {
   description = "Availability zones for cluster"
   type        = list(string)
   default     = null
-}
-
-variable "cluster_secrets_management" {
-  description = "Use Keyvault to manage secrets"
-  type        = bool
-  default     = false
 }
 
 variable "cluster_sku_tier" {

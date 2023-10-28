@@ -19,7 +19,7 @@ resource "azurerm_public_ip" "vm_pip" {
   tags                = var.tags
 }
 
-# create a network interface with a static ip
+# create a network interface
 resource "azurerm_network_interface" "nic" {
   name                = "${var.vm_name}-nic"
   resource_group_name = var.resource_group_name
@@ -36,7 +36,7 @@ resource "azurerm_network_interface" "nic" {
 
 }
 
-# create the virtual machine with given ssh-key
+# create the virtual machine
 resource "azurerm_linux_virtual_machine" "vm" {
   name                = var.vm_name
   resource_group_name = var.resource_group_name

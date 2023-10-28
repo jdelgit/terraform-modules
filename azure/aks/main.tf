@@ -11,6 +11,7 @@ resource "azurerm_kubernetes_cluster" "cluster" {
   sku_tier                          = var.cluster_sku_tier
   local_account_disabled            = var.local_account_disabled
   oidc_issuer_enabled               = var.oidc_issuer_enabled
+  workload_identity_enabled         = var.workload_identity_enabled
 
   api_server_access_profile {
     authorized_ip_ranges     = var.private_cluster_enabled ? null : var.authorized_ip_ranges
@@ -52,13 +53,17 @@ resource "azurerm_kubernetes_cluster" "cluster" {
     type = "SystemAssigned"
   }
 
+  storage_profile {
+    blob_driver_enabled         = var.enable_azure_blob_storage
+    disk_driver_enabled         = var.enable_azure_disk_storage
+    file_driver_enabled         = var.enable_azure_file_storage
+    disk_driver_version         = var.azure_disk_driver_version
+    snapshot_controller_enabled = var.snapshot_controller_enabled
+  }
+
+  lifecycle {
+    ignore_changes = [kubernetes_version]
+  }
+
   tags = var.tags
 }
-
-resource "azurerm_role_assignment" "k8s_keyvault" {
-  count                = var.cluster_secrets_management == true ? 1 : 0
-  scope                = var.keyvault_secrets_provider_id
-  role_definition_name = "Key Vault Administrator"
-  principal_id         = azurerm_kubernetes_cluster.cluster.key_vault_secrets_provider[0].secret_identity[0].object_id
-}
-

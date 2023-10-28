@@ -40,7 +40,7 @@ resource "azurerm_private_dns_zone" "kv" {
 
 resource "azurerm_private_endpoint" "pe_kv" {
   count               = var.create_private_endpoint == true ? 1 : 0
-  name                = format("pe-%s", var.keyvault_name)
+  name                = "pe-${var.keyvault_name}"
   location            = var.location
   resource_group_name = var.resource_group_name
   subnet_id           = var.private_endpoint_subnet_id
@@ -52,9 +52,38 @@ resource "azurerm_private_endpoint" "pe_kv" {
   }
 
   private_service_connection {
-    name                           = format("pse-%s", var.keyvault_name)
+    name                           = "pse-${var.keyvault_name}"
     private_connection_resource_id = azurerm_key_vault.kv.id
     is_manual_connection           = false
     subresource_names              = ["Vault"]
   }
+}
+
+
+############################
+# Create Managed Identity resources
+# Based of https://learn.microsoft.com/en-us/azure/aks/csi-secrets-store-identity-access
+resource "azurerm_user_assigned_identity" "managed_identity" {
+  count               = var.create_managed_identity == true ? 1 : 0
+  name                = "${var.keyvault_name}-kv-mngd-id"
+  resource_group_name = var.resource_group_name
+  location            = var.location
+  tags                = var.tags
+}
+
+resource "azurerm_role_assignment" "managed_identity_keyvault" {
+  count                = var.create_managed_identity == true ? 1 : 0
+  scope                = azurerm_key_vault.kv.id
+  role_definition_name = "Key Vault Administrator"
+  principal_id         = azurerm_user_assigned_identity.managed_identity[0].principal_id
+}
+
+resource "azurerm_federated_identity_credential" "app" {
+  count               = var.create_managed_identity == true ? 1 : 0
+  name                = "${var.keyvault_name}-fed-cred"
+  resource_group_name = var.resource_group_name
+  audience            = var.managed_identity_fed_credential_audience
+  issuer              = var.managed_identity_fed_credential_oidc_issuer_url
+  subject             = var.managed_identity_fed_credential_subject
+  parent_id           = azurerm_user_assigned_identity.managed_identity[0].id
 }
